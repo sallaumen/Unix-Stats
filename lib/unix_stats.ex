@@ -1,6 +1,7 @@
 defmodule UnixStats do
   require Logger
 
+  alias Support.Printer
   alias UnixStats.Measure.{
     Cpu,
     Gpu,
@@ -19,38 +20,35 @@ defmodule UnixStats do
   end
 
   defp measure_and_inspect(time, format, process) do
-    period = 0..time
+    period = 0..time*10
 
-    print_header(format)
+    Printer.print_header(format)
 
-    Enum.map(period, fn second ->
-      second
+    Enum.map(period, fn iteration ->
+      t_start = DateTime.utc_now()
+
+      iteration
       |> measure_all(process)
-      |> print_result(format)
+      |> Printer.print_result(format)
 
-      :timer.sleep(1000)
+      t_finish = DateTime.utc_now()
+
+      sleep_100_ms(t_start, t_finish)
     end)
-
     :ok
   end
 
   defp measure_all(second, process) do
     {
-      second,
+      second/10,
       Cpu.measure(process),
       Ram.measure(process),
       Gpu.measure(process)
     }
   end
 
-  defp print_header(:pretty), do: :noop
-  defp print_header(:csv), do: IO.puts("time(s),cpu,ram,gpu,graphic ram")
-
-  defp print_result({time, cpu, ram, {gpu, g_ram}}, :pretty) do
-    IO.puts("Elapsed Time: #{time}    CPU: #{cpu}%    RAM: #{ram}%    GPU: #{gpu}%    Graphic RAM: #{g_ram}%")
-  end
-
-  defp print_result({time, cpu, ram, {gpu, g_ram}}, :csv) do
-    IO.puts("#{time};#{cpu};#{ram};#{gpu};#{g_ram}")
+  defp sleep_100_ms(t_start, t_finish) do
+    exec_time = DateTime.diff(t_start, t_finish, :millisecond)
+    :timer.sleep(100 + exec_time)
   end
 end
