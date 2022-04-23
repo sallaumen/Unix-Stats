@@ -9,7 +9,7 @@ defmodule UnixStats.Measure.Gpu do
     data =
       "nvidia-smi"
       |> CliExecutor.execute()
-      |> String.split("\n")
+      |> split_when_possible()
 
     {
       get_gpu_use_from_data(data),
@@ -17,6 +17,14 @@ defmodule UnixStats.Measure.Gpu do
     }
   end
 
+  defp split_when_possible(output) do
+    case String.contains?(output, "not found") do
+      true -> :not_found
+      false -> String.split(output, "\n")
+    end
+  end
+
+  defp get_gpu_use_from_data(:not_found), do: "0"
   defp get_gpu_use_from_data(data) do
     data
     |> Enum.at(9)
@@ -27,6 +35,7 @@ defmodule UnixStats.Measure.Gpu do
     |> String.trim()
   end
 
+  defp get_video_memory_use_from_data(:not_found, _), do: "0"
   defp get_video_memory_use_from_data(data, process) do
     beam_use =
       data
