@@ -3,7 +3,7 @@ defmodule UnixStats.Measure.Gpu do
 
   alias Support.CliExecutor
 
-  @gpu_ram_limit 4038
+  @gpu_ram_limit 7981
 
   def measure(process) do
     data =
