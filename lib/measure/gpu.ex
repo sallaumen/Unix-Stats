@@ -5,7 +5,8 @@ defmodule UnixStats.Measure.Gpu do
 
   @gpu_ram_limit 7981
 
-  def measure(process) do
+  def measure(_, error_count) when error_count >= 30, do: {"0.0", "0.0"}
+  def measure(process, _error_count) do
     data =
       "nvidia-smi"
       |> CliExecutor.execute()

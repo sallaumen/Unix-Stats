@@ -3,7 +3,7 @@ defmodule UnixStats.Measure.Cpu do
 
   alias Support.CliExecutor
 
-  def measure(_) do
+  def measure(_, _) do
     ~s<grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'>
     |> CliExecutor.execute()
   end

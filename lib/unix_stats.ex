@@ -27,42 +27,46 @@ defmodule UnixStats do
 
   defp measure_and_inspect(time, format, process_name) do
     period = 0..(time * 10)
-
+    error_count = 0
     log_file_name = generate_log_file_name(process_name)
     Printer.print_header(format)
 
-    Enum.map(period, fn iteration ->
+    Enum.reduce(period, error_count, fn iteration, error_count ->
       t_start = DateTime.utc_now()
 
       iteration
-      |> measure_all(process_name)
+      |> measure_all(process_name, error_count)
       |> Printer.print_result(format)
       |> Writer.write_result_to_file(log_file_name)
 
       t_finish = DateTime.utc_now()
 
-      sleep_100_ms(t_start, t_finish)
+      sleep_100_ms_and_adjust_error_count_when_needed(t_start, t_finish, error_count)
     end)
 
     :ok
   end
 
-  defp measure_all(second, process) do
+  defp measure_all(second, process, error_count) do
     {
       second / 10,
-      Cpu.measure(process),
-      Ram.measure(process),
-      Gpu.measure(process)
+      Cpu.measure(process, error_count),
+      Ram.measure(process, error_count),
+      Gpu.measure(process, error_count)
     }
   end
 
-  defp sleep_100_ms(t_start, t_finish) do
+  defp sleep_100_ms_and_adjust_error_count_when_needed(t_start, t_finish, error_count) do
     exec_time = DateTime.diff(t_start, t_finish, :millisecond)
     sleep_time = 100 + exec_time
 
     case sleep_time > 0 do
-      true -> :timer.sleep(sleep_time)
-      false -> IO.puts("Taking too long to create measurements")
+      true ->
+        :timer.sleep(sleep_time)
+              error_count
+      false ->
+        IO.puts("Taking too long to create measurements")
+        error_count + 1
     end
   end
 

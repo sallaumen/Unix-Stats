@@ -3,7 +3,7 @@ defmodule UnixStats.Measure.Ram do
 
   alias Support.CliExecutor
 
-  def measure(_) do
+  def measure(_, _) do
     ~s<free | grep Mem | awk '{usage=($3/$2)*100} END {print usage}'>
     |> CliExecutor.execute()
   end
