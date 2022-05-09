@@ -4,23 +4,20 @@ CLI Unix hardware use monitor.
 
 Currently, the following monitoring modules are implemented:
  - CPU
- - GPU
  - RAM
+ - GPU**
+ - Graphic RAM**
 
-## Installation
+** GPU and Graphic RAM are only available for NVIDIA graphic cards.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `unix_stats` to your list of dependencies in `mix.exs`:
+# Quick how to:
 
-```elixir
-def deps do
-  [
-    {:unix_stats, "~> 0.1.0"}
-  ]
-end
-```
+> Start a interative terminal:
+> > iex -S mix
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/unix_stats](https://hexdocs.pm/unix_stats).
-
+> Run function UnixStats.measure/3
+> 
+> Arguments: time, visualization method (:pretty or :csv) and analyzing process name
+> 
+> example:
+> > UnixStats.measure(60, :pretty, "beam.smp")
