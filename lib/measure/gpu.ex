@@ -25,6 +25,7 @@ defmodule UnixStats.Measure.Gpu do
   end
 
   defp get_gpu_use_from_data(:not_found), do: "0"
+
   defp get_gpu_use_from_data(data) do
     data
     |> Enum.at(9)
@@ -36,6 +37,7 @@ defmodule UnixStats.Measure.Gpu do
   end
 
   defp get_video_memory_use_from_data(:not_found, _), do: "0"
+
   defp get_video_memory_use_from_data(data, process) do
     beam_use =
       data
